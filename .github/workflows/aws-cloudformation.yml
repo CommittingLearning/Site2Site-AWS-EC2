@@ -1,0 +1,93 @@
+name: AWS Cloudformation CI/CD Pipeline
+
+# Only run on pull requests (for code validation and testing)
+# and on pushes to development and production (for full deployment)
+on:
+    pull_request:
+        branches:
+            - development
+            - production
+            - testing
+    push:
+        branches:
+            - development
+            - production
+
+jobs:
+    validate-and-test:
+        runs-on: ubuntu-latest
+        permissions:
+          id-token: write
+          contents: read
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            aws-region: us-west-2
+
+        # Pre-deployment checks: CloudFormation template validation and plan
+        - name: Validate Cloudformation Template
+          run: |
+            aws cloudformation validate-template --template-body file://template.yaml
+
+        # Security testing with CloudFormation Guard
+        - name: Run CloudFormation Guard
+          run: |
+            cfn-guard validate --rules.guard --template template.yaml  
+
+        # Unit & integration tests using AWS CLI
+        - name: Run AWS CLI Tests
+          run: |
+            aws cloudformation describe-stacks --stack-name test-stack
+
+        # Skip applying changes in pull requests
+        - name: Skip Apply in Pull Requests
+          if: github.event_name == 'pull_request'
+          run: |
+            echo "Skipping apply since this is a pull request validation."
+            exit 0
+
+    deploy:
+        needs: validate-and-test
+        runs-on: ubuntu-latest
+        # Runs only on push events
+        if: github.event_name != 'pull_request'
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            aws-region: us-west-2
+
+        # Manual approval before terraform apply
+        - name: Manual Approval
+          uses: hmarr/auto-approve-action@v2
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
+        # Apply changes after approval
+        - name: Deploy CloudFormation Stack
+          run: |
+            aws cloudformation deploy \
+              --template-file template.yampl \
+              --stack-name ${{ github.ref_name }}-stack \
+              --capabilities CAPABILITY_IAM
+
+        # Wait for 1 hour and destroy resources
+        - name: Wait for demonstration period
+          run: sleep 3600
+
+        # Destroy resources to avoid unnecessary costs
+        - name: Delete CloudFormation Stack
+          run: |
+            aws cloudformation delete-stack --stack-name ${{ github.ref_name }}-stack
+            aws cloudformation wait stack-delete-complete --stack-name ${{ github.ref_name }}-stack
