@@ -20,13 +20,13 @@ Parameters:
     Description: The AMI for the EC2 instance
     Default: "ami-07c5ecd8498c59db5"
   
-  SubnetID:
+  SubnetId:
     Type: String
     Description: "Subnet ID from the VPC Template"
 
-  VPCID:
+  VPCId:
     Type: String
-    Description: "VPC IDD from the VPC template"
+    Description: "VPC ID from the VPC template"
 
   PolicyName:
     Type: String
@@ -42,7 +42,7 @@ Resources:
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
-          SubnetId: !Ref SubnetID
+          SubnetId: !Ref SubnetId
     IamInstanceProfile: !Ref SSMInstanceProfile
     Tags:
       - Key: Name
