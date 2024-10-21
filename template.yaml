@@ -59,25 +59,35 @@ Resources:
               Service: "ec2.amazonaws.com"
             Action: "sts:AssumeRole"
       Path: "/"
-      Policies:
-        - PolicyName: !Sub '${PolicyName}_${Environment}'
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "ssm:SendCommand"
-                  - "ssm:DescribeInstanceInformation"
-                  - "ssm:StartSession"
-                  - "ssm:TerminateSession"
-                  - "ssm:ResumeSession"
-                  - "ec2messages:*"
-                  - "cloudwatch:PutMetricData"
-                  - "ssmmessages:*"
-                Resource: "*"
+      
+  SSMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub '${PolicyName}_${Environment}'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ssm:SendCommand"
+              - "ssm:DescribeInstanceInformation"
+              - "ssm:StartSession"
+              - "ssm:TerminateSession"
+              - "ssm:ResumeSession"
+              - "ec2messages:*"
+              - "cloudwatch:PutMetricData"
+              - "ssmmessages:*"
+            Resource: "*"
+        Roles:
+          - !Ref SSMRole
   
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
         - !Ref SSMRole
+
+Outputs:
+  InstanceId:
+    Description: "ID of the created EC2 instance"
+    Value: !Ref EC2Instance
