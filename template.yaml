@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "EC2 instance Template"
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The environment name (e.g., development, production)
+    AllowedValues:
+      - development
+      - production
+      - default
+
+  InstanceType:
+    Type: String
+    Description: The instance type to be provisioned
+    Default: "t2.micro"
+
+  ImageID:
+    Type: String
+    Description: The AMI for the EC2 instance
+    Default: "ami-07c5ecd8498c59db5"
+  
+  SubnetID:
+    Type: String
+    Description: "Subnet ID from the VPC Template"
+
+  VPCID:
+    Type: String
+    Description: "VPC IDD from the VPC template"
+
+  PolicyName:
+    Type: String
+    Description: Name for the IAM Role
+    Default: "SSMPolicy" 
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageID
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: false
+          SubnetId: !Ref SubnetID
+    IamInstanceProfile: !Ref SSMInstanceProfile
+    Tags:
+      - Key: Name
+        Value: !Sub 'EC2_${Environment}'
+
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: !Sub '${PolicyName}_${Environment}'
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ssm:SendCommand"
+                  - "ssm:DescribeInstanceInformation"
+                  - "ssm:StartSession"
+                  - "ssm:TerminateSession"
+                  - "ssm:ResumeSession"
+                  - "ec2messages:*"
+                  - "cloudwatch:PutMetricData"
+                  - "ssmmessages:*"
+                Resource: "*"
+  
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMRole
