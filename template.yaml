@@ -37,6 +37,11 @@ Parameters:
     Type: String
     Description: "Name for the IAM policy to be attached to the EC2 instance"
     Default: "SSMInstanceProfile"
+  
+  SSMRoleName:
+    Type: String
+    Description: "Name of the SSM Role name to be created"
+    Default: "S2S_SSM_Role"
 
 Resources:
   EC2Instance:
@@ -59,6 +64,7 @@ Resources:
   SSMRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub '${SSMRoleName}_${Environment}'
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -106,6 +112,7 @@ Resources:
       Path: '/'
       Roles:
         - !Ref SSMRole
+    DependsOn: SSMRole
 
 Outputs:
   InstanceId:
