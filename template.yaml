@@ -84,6 +84,8 @@ Resources:
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
+      InstanceProfileName: !Sub 'SSMInstanceProfile_${Environment}'
+      Path: '/'
       Roles:
         - !Ref SSMRole
 
