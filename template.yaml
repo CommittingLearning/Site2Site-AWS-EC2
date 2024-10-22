@@ -36,7 +36,7 @@ Parameters:
   ProfileName:
     Type: String
     Description: "Name for the IAM policy to be attached to the EC2 instance"
-    Default: "SSMInstanceProfile"
+    Default: "S2S-EC2-SSMProfile"
   
   SSMRoleName:
     Type: String
@@ -63,7 +63,7 @@ Resources:
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: !Sub '${ProfileName}_${Environment}'
+      InstanceProfileName: !Sub '${ProfileName}-${Environment}'
       Path: "/"
       Roles:
         - !Ref SSMRole
