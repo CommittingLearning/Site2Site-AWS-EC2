@@ -30,8 +30,12 @@ Parameters:
 
   PolicyName:
     Type: String
-    Description: Name for the IAM Role
-    Default: "SSMPolicy" 
+    Description: "Name for the IAM Role"
+    Default: "SSMPolicy"
+
+  ProfileName:
+    Type: String
+    Description: "Name for the IAM policy to be attached to the EC2 instance"
 
 Resources:
   EC2Instance:
@@ -43,8 +47,7 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
-    IamInstanceProfile: 
-      Ref: SSMInstanceProfile
+    IamInstanceProfile: !GetAtt SSMInstanceProfile.InstanceProfileName
     Tags:
       - Key: Name
         Value: !Sub 'EC2_${Environment}'
@@ -85,7 +88,7 @@ Resources:
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: !Sub 'SSMInstanceProfile_${Environment}'
+      InstanceProfileName: !Sub '${ProfileName}_${Environment}'
       Path: '/'
       Roles:
         - !Ref SSMRole
