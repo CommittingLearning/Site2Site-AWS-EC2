@@ -52,6 +52,9 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub 'EC2_${Environment}'
+    DependsOn: 
+      - SSMInstanceProfile
+      - SSMPolicy
 
   SSMRole:
     Type: AWS::IAM::Role
@@ -93,6 +96,7 @@ Resources:
             Resource: "*"
         Roles:
           - !Ref SSMRole
+    DependsOn: SSMRole
     DeletionPolicy: Retain
   
   SSMInstanceProfile:
