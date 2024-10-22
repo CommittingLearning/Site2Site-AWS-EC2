@@ -44,7 +44,7 @@ Resources:
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
     IamInstanceProfile: 
-      Name: !Ref SSMInstanceProfile
+      Ref: SSMInstanceProfile
     Tags:
       - Key: Name
         Value: !Sub 'EC2_${Environment}'
