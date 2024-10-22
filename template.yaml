@@ -36,6 +36,7 @@ Parameters:
   ProfileName:
     Type: String
     Description: "Name for the IAM policy to be attached to the EC2 instance"
+    Default: "SSMInstanceProfile"
 
 Resources:
   EC2Instance:
