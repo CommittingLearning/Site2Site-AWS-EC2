@@ -47,11 +47,10 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
-    IamInstanceProfile:
-      Fn::GetAtt: [SSMInstanceProfile, InstanceProfileName]
-    Tags:
-      - Key: Name
-        Value: !Sub 'EC2_${Environment}'
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      Tags:
+        - Key: Name
+          Value: !Sub 'EC2_${Environment}'
 
   SSMRole:
     Type: AWS::IAM::Role
