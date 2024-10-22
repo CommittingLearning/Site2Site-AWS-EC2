@@ -44,6 +44,31 @@ Parameters:
     Default: "S2S_SSM_Role"
 
 Resources:
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${SSMRoleName}_${Environment}'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Path: "/"
+    DeletionPolicy: Retain
+
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${ProfileName}_${Environment}'
+      Path: "/"
+      Roles:
+        - !Ref SSMRole
+    DependsOn: SSMRole
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -59,60 +84,6 @@ Resources:
           Value: !Sub 'EC2_${Environment}'
     DependsOn: 
       - SSMInstanceProfile
-      - SSMPolicy
-
-  SSMRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub '${SSMRoleName}_${Environment}'
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: "ec2.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Path: "/"
-    DeletionPolicy: Retain
-      
-  SSMPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: !Sub '${PolicyName}_${Environment}'
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action:
-              - "ssm:SendCommand"
-              - "ssm:DescribeInstanceInformation"
-              - "ssm:StartSession"
-              - "ssm:TerminateSession"
-              - "ssm:ResumeSession"
-              - "ssm:PutParameter"      
-              - "ssm:GetParameter"          
-              - "ssm:GetParameters"        
-              - "ssm:GetParametersByPath"    
-              - "logs:CreateLogGroup"        
-              - "logs:CreateLogStream"
-              - "logs:PutLogEvents"
-              - "ec2messages:*"
-              - "cloudwatch:PutMetricData"
-              - "ssmmessages:*"
-            Resource: "*"
-        Roles:
-          - !Ref SSMRole
-    DependsOn: SSMRole
-    DeletionPolicy: Retain
-  
-  SSMInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: !Sub '${ProfileName}_${Environment}'
-      Path: '/'
-      Roles:
-        - !Ref SSMRole
-    DependsOn: SSMRole
 
 Outputs:
   InstanceId:
