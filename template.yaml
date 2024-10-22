@@ -80,6 +80,13 @@ Resources:
               - "ssm:StartSession"
               - "ssm:TerminateSession"
               - "ssm:ResumeSession"
+              - "ssm:PutParameter"      
+              - "ssm:GetParameter"          
+              - "ssm:GetParameters"        
+              - "ssm:GetParametersByPath"    
+              - "logs:CreateLogGroup"        
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
               - "ec2messages:*"
               - "cloudwatch:PutMetricData"
               - "ssmmessages:*"
@@ -95,7 +102,6 @@ Resources:
       Path: '/'
       Roles:
         - !Ref SSMRole
-    DeletionPolicy: Retain
 
 Outputs:
   InstanceId:
