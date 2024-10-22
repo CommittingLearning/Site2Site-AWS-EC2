@@ -64,6 +64,7 @@ Resources:
               Service: "ec2.amazonaws.com"
             Action: "sts:AssumeRole"
       Path: "/"
+    DeletionPolicy: Retain
       
   SSMPolicy:
     Type: AWS::IAM::Policy
@@ -85,6 +86,7 @@ Resources:
             Resource: "*"
         Roles:
           - !Ref SSMRole
+    DeletionPolicy: Retain
   
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -93,6 +95,7 @@ Resources:
       Path: '/'
       Roles:
         - !Ref SSMRole
+    DeletionPolicy: Retain
 
 Outputs:
   InstanceId:
