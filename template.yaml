@@ -43,7 +43,8 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
-    IamInstanceProfile: !Ref SSMInstanceProfile
+    IamInstanceProfile: 
+      Name: !Ref SSMInstanceProfile
     Tags:
       - Key: Name
         Value: !Sub 'EC2_${Environment}'

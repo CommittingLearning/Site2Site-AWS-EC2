@@ -31,6 +31,12 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: us-west-2
+
+      # CloudFormation Validate Step
+      - name: Validate CloudFormation template
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://template.yaml
           
       # Run CloudFormation Guard using Guard-Action
       - name: Run CloudFormation Guard
