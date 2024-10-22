@@ -47,7 +47,8 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
-    IamInstanceProfile: !GetAtt SSMInstanceProfile.arn
+    IamInstanceProfile:
+      Fn::GetAtt: [SSMInstanceProfile, InstanceProfileName]
     Tags:
       - Key: Name
         Value: !Sub 'EC2_${Environment}'
