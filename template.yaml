@@ -82,6 +82,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub 'EC2_${Environment}'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum install -y amazon-ssm-agent
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
     DependsOn: 
       - SSMInstanceProfile
 
