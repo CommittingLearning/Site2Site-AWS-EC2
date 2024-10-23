@@ -40,7 +40,6 @@ jobs:
           
       # Run CloudFormation Guard using Guard-Action
       - name: Run CloudFormation Guard
-        continue-on-error: true
         uses: grolston/guard-action@main
         with:
           data_directory: './'

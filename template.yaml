@@ -27,6 +27,10 @@ Parameters:
   VPCId:
     Type: String
     Description: "VPC ID from the VPC template"
+  
+  VPCCIDR:
+    Type: String
+    Description: "The Cidr Range of the VPC"
 
   PolicyName:
     Type: String
@@ -83,7 +87,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: '0.0.0.0/0'
+          CidrIp: !Ref VPCCIDR
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
