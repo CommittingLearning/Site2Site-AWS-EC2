@@ -91,11 +91,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 98.247.36.44
+          CidrIp: "98.247.36.44/32"
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 98.247.36.44
+          CidrIp: "98.247.36.44/32"
       Tags:
         - Key: Name
           Value: !Sub '${EC2SGName}_${Environment}'
