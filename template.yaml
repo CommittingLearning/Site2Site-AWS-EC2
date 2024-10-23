@@ -28,7 +28,7 @@ Parameters:
     Type: String
     Description: "VPC ID from the VPC template"
 
-  SecurityGroupId:
+  EC2SecurityGroupId:
     Type: String
     Description: "Security Group ID from the VPC template"
 
@@ -79,7 +79,7 @@ Resources:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageID
       SecurityGroupIds:
-        - !Ref SecurityGroupId
+        - !Ref EC2SecurityGroupId
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
