@@ -78,12 +78,12 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageID
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
-          GroupSet:
-            - !Ref SecurityGroupId
       IamInstanceProfile: !Ref SSMInstanceProfile
       Tags:
         - Key: Name
