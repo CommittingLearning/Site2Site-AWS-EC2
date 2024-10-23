@@ -93,12 +93,12 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageID
-      SecurityGroupIds:
-        - !Ref EC2SecurityGroup
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref EC2SecurityGroup
       IamInstanceProfile: !Ref SSMInstanceProfile
       Tags:
         - Key: Name
@@ -106,7 +106,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          yum install -y amazon-ssm-agent
           systemctl enable amazon-ssm-agent
           systemctl start amazon-ssm-agent
     DependsOn: 
