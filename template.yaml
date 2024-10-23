@@ -81,6 +81,7 @@ Resources:
       VpcId: !Ref VPCId
       SecurityGroupEgress:
         - IpProtocol: tcp
+          FromPort: -1
           ToPort: 443
           CidrIp: '0.0.0.0/0'
       Tags:
