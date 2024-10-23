@@ -28,6 +28,10 @@ Parameters:
     Type: String
     Description: "VPC ID from the VPC template"
 
+  SecurityGroupId:
+    Type: String
+    Description: "Security Group ID from the VPC template"
+
   PolicyName:
     Type: String
     Description: "Name for the IAM Role"
@@ -78,6 +82,8 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref SecurityGroupId
       IamInstanceProfile: !Ref SSMInstanceProfile
       Tags:
         - Key: Name
