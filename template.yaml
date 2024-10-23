@@ -111,6 +111,7 @@ Resources:
           systemctl start amazon-ssm-agent
     DependsOn: 
       - SSMInstanceProfile
+      - EC2SecurityGroup
 
 Outputs:
   InstanceId:
