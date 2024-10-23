@@ -28,10 +28,6 @@ Parameters:
     Type: String
     Description: "VPC ID from the VPC template"
 
-  EC2SecurityGroupId:
-    Type: String
-    Description: "Security Group ID from the VPC template"
-
   PolicyName:
     Type: String
     Description: "Name for the IAM Role"
@@ -46,6 +42,11 @@ Parameters:
     Type: String
     Description: "Name of the SSM Role name to be created"
     Default: "S2S_SSM_Role"
+
+  EC2SGName:
+    Type: String
+    Description: "Name of the security group attached to the EC2 instance."
+    Default: 'S2SEC2SG'
 
 Resources:
   SSMRole:
@@ -73,13 +74,26 @@ Resources:
         - !Ref SSMRole
     DependsOn: SSMRole
 
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for EC2 instances"
+      VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+      Tags:
+        - Key: Name
+          Value: !Sub '${EC2SGName}_${Environment}'
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageID
       SecurityGroupIds:
-        - !Ref EC2SecurityGroupId
+        - !Ref EC2SecurityGroup
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
