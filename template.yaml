@@ -78,29 +78,6 @@ Resources:
         - !Ref SSMRole
     DependsOn: SSMRole
 
-  EC2SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: "Security Group for EC2 instances"
-      VpcId: !Ref VPCId
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: !Ref VPCCIDR
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: "0.0.0.0/0"
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: "0.0.0.0/0"
-      Tags:
-        - Key: Name
-          Value: !Sub '${EC2SGName}_${Environment}'
-
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -123,7 +100,6 @@ Resources:
           sudo systemctl start amazon-ssm-agent
     DependsOn: 
       - SSMInstanceProfile
-      - EC2SecurityGroup
 
 Outputs:
   InstanceId:
