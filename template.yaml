@@ -67,7 +67,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: "/"
-    DeletionPolicy: Retain
 
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
