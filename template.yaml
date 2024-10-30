@@ -87,6 +87,7 @@ Resources:
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
       IamInstanceProfile: !Ref SSMInstanceProfile
+      SourceDestCheck: false
       Tags:
         - Key: Name
           Value: !Sub 'EC2_${Environment}'
