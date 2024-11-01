@@ -111,7 +111,7 @@ Resources:
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
           GroupSet:
-            !Ref EC2SecurityGroup
+            - !Ref EC2SecurityGroup
       IamInstanceProfile: !Ref SSMInstanceProfile
       SourceDestCheck: false
       Tags:
