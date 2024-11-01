@@ -50,7 +50,12 @@ Parameters:
   EC2SGName:
     Type: String
     Description: "Name of the security group attached to the EC2 instance."
-    Default: 'S2SEC2SG'
+    Default: "S2SEC2SG"
+
+  AzureCIDR:
+    Type: String
+    Description: "The CIDR block of the Azure Vnet"
+    Default: "10.0.0.0/16"
 
 Resources:
   SSMRole:
@@ -77,6 +82,25 @@ Resources:
         - !Ref SSMRole
     DependsOn: SSMRole
 
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for EC2 instance"
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref AzureCIDR
+      SecurityGroupEgress:
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref AzureCIDR
+      Tags:
+        - Key: Name
+          Value: !Sub 's2sEc2Sg_${Environment}'
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -86,6 +110,8 @@ Resources:
         - DeviceIndex: 0
           AssociatePublicIpAddress: false
           SubnetId: !Ref SubnetId
+          GroupSet:
+            !Ref EC2SecurityGroup
       IamInstanceProfile: !Ref SSMInstanceProfile
       SourceDestCheck: false
       Tags:
@@ -93,6 +119,7 @@ Resources:
           Value: !Sub 'EC2_${Environment}'
     DependsOn: 
       - SSMInstanceProfile
+      - EC2SecurityGroup
 
 Outputs:
   InstanceId:
