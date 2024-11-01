@@ -92,11 +92,19 @@ Resources:
           FromPort: -1
           ToPort: -1
           CidrIp: !Ref AzureCIDR
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCCIDR
       SecurityGroupEgress:
         - IpProtocol: icmp
           FromPort: -1
           ToPort: -1
           CidrIp: !Ref AzureCIDR
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCCIDR
       Tags:
         - Key: Name
           Value: !Sub 's2sEc2Sg_${Environment}'
