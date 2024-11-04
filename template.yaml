@@ -58,6 +58,7 @@ Parameters:
     Default: "10.0.0.0/16"
 
 Resources:
+  # Creating an IAM Role for SSM access for the EC2 instance
   SSMRole:
     Type: AWS::IAM::Role
     Properties:
@@ -73,6 +74,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: "/"
 
+  # Creating an instance profile to attach IAM role to the EC2 instance
   SSMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -82,6 +84,7 @@ Resources:
         - !Ref SSMRole
     DependsOn: SSMRole
 
+  # Creating a Security group for the EC2 instance
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -105,6 +108,7 @@ Resources:
         - Key: Name
           Value: !Sub 's2sEc2Sg_${Environment}'
 
+  # Provisioning the EC2 Instance
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:

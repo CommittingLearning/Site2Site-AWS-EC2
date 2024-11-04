@@ -40,7 +40,7 @@ jobs:
           
       # Run CloudFormation Guard using Guard-Action
       - name: Run CloudFormation Guard
-        continue-on-error: true
+        continue-on-error: true     # Has to continue on error as the Security group allows full outbound access to the EC2 instance for SSM access, which would fail any benchmark
         uses: grolston/guard-action@main
         with:
           data_directory: './'
@@ -97,7 +97,7 @@ jobs:
         run: |
           aws s3 cp template.yaml ${{ env.S3_BUCKET }}EC2-${{ env.ENVIRONMENT }}-template.yaml
 
-      # Trigger Parent Stack Deployment via Webhooks
+      # Trigger Parent Stack Deployment
       - name: Trigger Parent Stack Deployment
         run: |
           curl -X POST \
