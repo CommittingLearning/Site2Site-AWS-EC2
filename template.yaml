@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "EC2 instance Template"
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The environment name (e.g., development, production)
+    AllowedValues:
+      - development
+      - production
+      - default
+
+  InstanceType:
+    Type: String
+    Description: The instance type to be provisioned
+    Default: "t2.micro"
+
+  ImageID:
+    Type: String
+    Description: The AMI for the EC2 instance
+    Default: "ami-07c5ecd8498c59db5"
+  
+  SubnetId:
+    Type: String
+    Description: "Subnet ID from the VPC Template"
+
+  VPCId:
+    Type: String
+    Description: "VPC ID from the VPC template"
+  
+  VPCCIDR:
+    Type: String
+    Description: "The Cidr Range of the VPC"
+
+  PolicyName:
+    Type: String
+    Description: "Name for the IAM Role"
+    Default: "SSMPolicy"
+
+  ProfileName:
+    Type: String
+    Description: "Name for the IAM policy to be attached to the EC2 instance"
+    Default: "S2S-EC2-SSMProfile"
+  
+  SSMRoleName:
+    Type: String
+    Description: "Name of the SSM Role name to be created"
+    Default: "S2S_SSM_Role"
+
+  EC2SGName:
+    Type: String
+    Description: "Name of the security group attached to the EC2 instance."
+    Default: "S2SEC2SG"
+
+  AzureCIDR:
+    Type: String
+    Description: "The CIDR block of the Azure Vnet"
+    Default: "10.0.0.0/16"
+
+Resources:
+  # Creating an IAM Role for SSM access for the EC2 instance
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${SSMRoleName}_${Environment}'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Path: "/"
+
+  # Creating an instance profile to attach IAM role to the EC2 instance
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${ProfileName}-${Environment}'
+      Path: "/"
+      Roles:
+        - !Ref SSMRole
+    DependsOn: SSMRole
+
+  # Creating a Security group for the EC2 instance
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for EC2 instance"
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref AzureCIDR
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCCIDR
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: '0.0.0.0/0'
+      Tags:
+        - Key: Name
+          Value: !Sub 's2sEc2Sg_${Environment}'
+
+  # Provisioning the EC2 Instance
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageID
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: false
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref SSMInstanceProfile
+      SourceDestCheck: false
+      Tags:
+        - Key: Name
+          Value: !Sub 'EC2_${Environment}'
+    DependsOn: 
+      - SSMInstanceProfile
+      - EC2SecurityGroup
+
+Outputs:
+  InstanceId:
+    Description: "ID of the created EC2 instance"
+    Value: !Ref EC2Instance
